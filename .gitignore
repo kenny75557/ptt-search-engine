@@ -38,8 +38,9 @@ bower_components
 build/Release
 
 # Dependency directories
-node_modules/
+pttSE/node_modules/
 jspm_packages/
+__pycache__/
 
 # TypeScript v1 declaration files
 typings/
