@@ -92,6 +92,8 @@ yarn build
         ├── Search.vue  // 搜尋帳號和關鍵字的頁面
         └── ViewRecords.vu  // 查看觀察清單紀錄的頁面
 ```
+![](https://i.imgur.com/M2wL9fu.jpg)
+
 
 ### Components使用
 #### Header.vue - 網頁標題以及三個功能頁面(帳號搜尋、關鍵字搜尋、觀察帳號清單)的切換
@@ -409,12 +411,14 @@ dsl = {
     res=es.search(index="article2", body= dsl)
     return json.dumps(res['hits'], indent=2, ensure_ascii=False)
 ```
-註:其餘細節請參見程式碼註解
+其餘細節請參見程式碼註解
 
 ### 將整套前後端包成Docker image
 #### Dockerfile
-[官方文檔](https://docs.docker.com/engine/reference/builder/)
 寫一個Dockerfile將Build好的前端專案及Flask包成一個image。
+
+[官方文檔](https://docs.docker.com/engine/reference/builder/)
+
 
 **Dockerfile**
 ```dockerfile=
@@ -428,7 +432,7 @@ RUN pip install -r requirements.txt
 # 每一個 RUN 指令會在現有映像檔之上加入新的一層，是在建立 (build) 映像檔的過程中會執行的指令。
 CMD python main.py #在Container中運行時所執行的指令
 ```
-**requirements.txt**:所使用套件的版本
+**requirements.txt**:所使用套件的版本。
 
 完成後，使用指令Build出一個docker image，在Flask資料夾下，Terminal輸入
 ```
@@ -446,7 +450,7 @@ docker image build -t <帳號>/<Image名稱>:<版本Tag> .
 
 docker run -d -e"ES=http://elastic:密碼@140.120.DB的對外port" -p 80:9527 --name newcontainer kenny2330/pttwebapp:ver_1.0
 ```
-指令參數:
--e 參數設定，前面提到的ES用來設置資料庫的Domain及密碼
--p 將主機的Port與Container的port綁定
--name 替你的Container命名
+指令參數:<br>
+-e 參數設定，前面提到的ES用來設置資料庫的Domain及密碼 <br> 
+-p 將主機的Port與Container的port綁定 <br> 
+-name 替你的Container命名 <br> 
