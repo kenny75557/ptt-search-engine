@@ -345,7 +345,7 @@ python app.py
 
 連結ES設定:
 
-```python=
+```python
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 es = Elasticsearch(os.environ['ES'],connection_class=RequestsHttpConnection, use_ssl=True,verify_certs=False,send_get_body_as='POST' )
 //ES帶換成['http://elastic:<key>@<Domain>']
@@ -355,7 +355,7 @@ es = Elasticsearch(os.environ['ES'],connection_class=RequestsHttpConnection, use
 #### 搜尋處理範例(由id檢索)
 API格式如下，"?"符號之後為用於設定DSL語法搜尋之參數，Elastisearch如何Query請參照:[連結1](https://godleon.github.io/blog/Elasticsearch/Elasticsearch-advanced-search/) ，[連結2](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html)
 
-```javascript=
+```javascript
 <yourDomain>/api/GetByUserId?user_id=String&start=timeStamp&end=timeStamp?size=25?from=1
  //
 <yourDomain>/api/GetByContent?Content=String&start=timeStamp&end=timeStamp?size=25?from=1
@@ -370,7 +370,7 @@ API格式如下，"?"符號之後為用於設定DSL語法搜尋之參數，Elast
 1. from:從第幾筆資料開始
 
 把資料處理好後包成DSL，使用ES的search function將送到DB，最後再以JSON格式回傳前端:
- ```python=
+ ```python
 dsl = {
   "size": size,
   "from": page,
@@ -421,7 +421,7 @@ dsl = {
 
 
 **Dockerfile**
-```dockerfile=
+```dockerfile
 FROM python:3.6.9 #Base Image環境版本
 
 WORKDIR /PTTapp #欲建立的工作目錄
@@ -446,7 +446,7 @@ docker image build -t <帳號>/<Image名稱>:<版本Tag> .
 
 #### 執行
 使用docker run指令，把服務on在Container上。
-```lua=
+```lua
 
 docker run -d -e"ES=http://elastic:密碼@140.120.DB的對外port" -p 80:9527 --name newcontainer kenny2330/pttwebapp:ver_1.0
 ```
