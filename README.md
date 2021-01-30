@@ -17,38 +17,7 @@
 
 `npm install -g @vue/cli`
 
-專案建置流程:
-```
-$ vue create <project_name>
-$ npm install axios vue-axios bootstrap jquery popper.js -save
-```
-建置完成後進入專案目錄:
 
-```
-// 在 app.vue
-<style>
-@import './assets/all';
-</style>
-
-// 然後到 指定資料夾內 新增 all.scss 後
-@import "~bootstrap/scss/functions";
-@import "./helpers/_variables";
-@import "~bootstrap/scss/bootstrap";
-
-// 在 assets 裡新增 helpers 資料夾並且放入 _variables.scss 
-// 來自 node_moudles/bootstrap/scss/_variables.scss
-
-// 執行 eslint init, 選擇有框架的
-// 將上面裝的套件匯入
-// main.js
-import axios from 'axios'
-import VueAxios from 'vue-axios'
-import 'bootstrap'
-
-Vue.use(VueAxios, axios)
-
-```
-### Compiles and hot-reloads for development
 開發時在專案目錄下可用來刷新修改後的網頁(在瀏覽器查看)。
 ```
 yarn serve
