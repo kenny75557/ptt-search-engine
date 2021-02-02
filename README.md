@@ -1,4 +1,6 @@
-# PTTSearchEngine_web
+
+
+# Ptt_SearchEngineWeb
 ## 使用Flask及Vuejs建立Web application
 使用vue前端框架開發一個單頁應用程式(SPA)，再將建置好的前端界面交由Flask作為服務端，處理Request以及對Elasticsearch下搜尋指令之API。此筆記將會分為Vue.js以及Flask兩部分。
 ### 架構圖
@@ -17,7 +19,12 @@
 
 `npm install -g @vue/cli`
 
+安裝JS套件管理工具[yarn](https://yarnpkg.com/getting-started/install)
+```
+npm install -g yarn
+```
 
+### Compiles and hot-reloads for development
 開發時在專案目錄下可用來刷新修改後的網頁(在瀏覽器查看)。
 ```
 yarn serve
