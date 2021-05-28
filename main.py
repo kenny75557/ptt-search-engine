@@ -5,17 +5,7 @@ import os
 import json
 from flask_cors import CORS
 import requests.packages.urllib3
-es = Elasticsearch(['http://elastic:xlgvtgkdf26kmht8rs28c2gr@140.120.182.93:31406'],connection_class=RequestsHttpConnection, use_ssl=True,verify_certs=False,send_get_body_as='POST' )
-
-# dsl = {
-# 'query': {
-# 'match': {
-# 'user_id': 'HelloP'
-# }
-# }
-# }
-# res=es.search(index="article", body= dsl)
-# print(json.dumps(res['hits'], indent=2, ensure_ascii=False))
+es = Elasticsearch(os.environ['ES'],connection_class=RequestsHttpConnection, use_ssl=True,verify_certs=False,max_retries=5,retry_on_timeout=True,send_get_body_as='POST' )
 
 
 requests.packages.urllib3.disable_warnings()
@@ -40,7 +30,20 @@ def static_proxy(path: str):
         return send_from_directory(static_dir, path)
     else:
         return send_file(os.path.join(static_dir, 'index.html'))
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return send_file(os.path.join(static_dir, 'index.html'))
 
+def get_list(query):
+    q_list=[]
+    token_li = query.split(' ')
+    for token in token_li:
+        dic_in = {"content":token}
+        dic_out = {"match_phrase":dic_in}
+        q_list.append(dic_out)
+
+    return q_list
 
 #id搜尋 query: ?user_id=String&start=timeStamp&end=timsSamp
 #http://140.120.182.87:6003/api/GetByUserId?user_id=stinger5009
@@ -64,36 +67,35 @@ def GetByUserId():
         dsl = {
            "size": query_size, 
            "from": query_page,
-            'query': {
-                'match': {
-                'user_id': query_id
-                }
+           "query": {
+                'match': {'user_id': query_id }
             },
             "sort": [
-        {
-        "date": {
-          "order": "desc"
-        }
-      }
-                ]
-            }
+                      {"date": {"order": "desc"}}
+                    ]
+          }
 
     else:
         dsl = {
            "size": query_size, 
            "from": query_page,
-        "query":
-          { "bool": { "must": [ { "match": { "user_id": query_id}},{ "range": { "date": { "gt": query_startTimestamp,"lt": query_endTimestamp}}}],"must_not": [],"should": []}},
-         "sort": [
-        {
-        "date": {
-          "order": "desc"
-        }
-      }
-                ]
+           "query":
+              { 
+            "bool": { 
+              "must": [ 
+                        { "match": {"user_id": query_id}},
+                        { "range": { "date": { "gt": query_startTimestamp,"lt":query_endTimestamp}}
+                         }
+                      ]
+             
+                 }
+              },
+               "sort": [
+                       {"date": {"order": "desc"} }
+                    ]
           }  #有下時間範圍
    
-    res=es.search(index="article2", body= dsl)
+    res=es.search(index="article", body= dsl)
     return json.dumps(res['hits'], indent=2, ensure_ascii=False)
     
 
@@ -113,76 +115,69 @@ def GetByContent():
       query_page = request.args.get("from")
     else:
         query_page = 0
-    # query_size =request.args.get("size")
-    # query_page =request.args.get("from")
-    # data = json.loads(request.get_data())
+    print(query_content)
+    qmatch_list = get_list(query_content)
+    print(qmatch_list)
+
+
+
     if    query_startTimestamp =='none': 
         dsl = {
-                "size": query_size,
-                "from": query_page,
-                "query": {
-                  "bool": {
-                    "must": [
-                      {
-                        "match": {
-                          "content": query_content
+           "size": query_size,
+           "from": query_page,
+           "query": {
+               "bool": {
+                 "should": [
+                  {"bool": {
+                    "must": qmatch_list
                         }
-                      },
-                      {
-                        "match": {
-                          "article_title": query_content
-                        }
-                      }
-                    ]
+                    },
+                  {"bool": {
+                      "must":qmatch_list,
+                      "must_not": {   "exists": {"field": "comment_tag"}}
+                    }
                   }
-                },
-                #  "sort": [
-                #           {
-                #           "date": {
-                #             "order": "desc"
-                #           }
-                #         }
-                #                   ]
+                 ],
+                 "minimum_should_match": 1
+                 }
+  }
             }
 
     else:
          dsl = {
-           "size": query_size, 
-           "from": query_page,
-        "query":
-          { "bool": { "must": [ { "match": { "content": query_content}},{ "match": { "article_title": query_content }},{ "range": { "date": { "gt": query_startTimestamp,"lt": query_endTimestamp}}}],"must_not": [],"should": []}},
-      #    "sort": [
-      #   {
-      #   "date": {
-      #     "order": "desc"
-      #   }
-      # }
-      #           ]
+            "size": query_size,
+            "from": query_page,
+            "query": {
+              "bool": {
+                  "should": [
+                      {"bool": {
+                                "must": qmatch_list
+                              }
+                       },
+                    {"bool": {
+                              "must":qmatch_list
+                              ,
+                              "must_not": {
+                                "exists": {"field": "comment_tag"}
+                              }
+                            }
+                            }
+                     ],
+      "must": [
+        {"range": { "date": { "gt": query_startTimestamp,"lt": query_endTimestamp}}}
+      ], 
+      "minimum_should_match": 1
+    }
+  }
+
+          
+  
           }  #有下時間範圍
-    res=es.search(index="article2", body= dsl)
+    res=es.search(index="article", body= dsl)
     return json.dumps(res['hits'], indent=2, ensure_ascii=False)
 
 
-# @app.route("/api/GetByTimestamp")
-# def GetByTimestamp():
-#     # data = json.loads(request.get_data())
-#     dsl = {
-#     'query': {
-#     "range": {
-#       "date": {
-#         "gte": "1596208410",
-#         "lt": "1596208415"
-#     }
-#     }
-#     }
-#     }
-#     res=es.search(index="article", body= dsl)
-#     print(res)
-#     return res   
 
-@app.route('/ping', methods=['GET'])
-def ping_pong():
-     return jsonify('pong!')
 
 
 if __name__ == '__main__':
