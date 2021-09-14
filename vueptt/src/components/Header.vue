@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar navbar-expand-sm navbar-dark bg-primary">
         <div class="navbar-nav">
-          <span class="nav-item active text-white">PPT搜尋引擎</span>
+          <span class="nav-item active text-white">PTT搜尋引擎</span>
         </div>
     </nav>
 

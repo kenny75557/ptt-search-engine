@@ -1,4 +1,5 @@
 <template>
+  <!-- 使用 vuejs-paginate 分頁套件 -->
   <paginate
     :value="pageNum"
     :page-count="totalPageCount"
@@ -25,7 +26,7 @@
 <script>
   import Paginate from 'vuejs-paginate';
   export default {
-    name: "pagination",    
+    name: "Pagination",    
     components: {
       Paginate,
     },
@@ -37,7 +38,9 @@
       totalPageCount: Number,
     },
     methods: {
+      // 回傳所在頁碼
       changePage(num) {
+        // 將所在頁碼傳遞到父元件
         this.$emit('updatePage', num);
       }
     }
