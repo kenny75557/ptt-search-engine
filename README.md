@@ -25,13 +25,13 @@ npm install -g yarn
 ```
 
 ### Compiles and hot-reloads for development
-開發時在專案目錄下可用來刷新修改後的網頁(在瀏覽器查看)。
+開發時在專案目錄下可用來刷新修改後的網頁(直接在瀏覽器查看)。
 ```
 yarn serve
 ```
 
 ### Compiles and minifies for production
-修改程式後使用指令建立出新的Dist資料夾，更新到後端目錄中。
+修改程式後執行build，並把建置好的dist資料夾更新到後端目錄中。
 ```
 yarn build
 ```
@@ -430,3 +430,4 @@ docker run -d -e"ES=http://elastic:密碼@140.120.DB的對外port" -p 80:9527 --
 -e 參數設定，前面提到的ES用來設置資料庫的Domain及密碼 <br> 
 -p 將主機的Port與Container的port綁定 <br> 
 -name 替你的Container命名 <br> 
+
