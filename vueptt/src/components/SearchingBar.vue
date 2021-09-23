@@ -72,15 +72,18 @@
     computed: {
     },
     methods: {
-      // 將時間轉換為 timestamp
-      dateToTimestamp(date){  // timestamp 單位為秒
+      // 將開始和結束時間轉換為 timestamp
+      startDateToTimestamp(date){  // timestamp 單位為秒
         return Date.parse(date+'T00:00:00') / 1000;
+      },
+      endDateToTimestamp(date){  // timestamp 單位為秒
+        return Date.parse(date+'T23:59:59') / 1000;
       },
       //TODO: prevent SQL injection if needed
       // 檢查是否為合法的搜尋
       checkSearch(){
-        this.d1 = this.dateToTimestamp(this.startDate)
-        this.d2 = this.dateToTimestamp(this.endDate)
+        this.d1 = this.startDateToTimestamp(this.startDate)
+        this.d2 = this.endDateToTimestamp(this.endDate)
 
         // 判斷輸入是否為空
         if(!this.input || this.input.trim().length === 0) { 

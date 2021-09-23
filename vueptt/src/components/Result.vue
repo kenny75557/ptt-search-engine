@@ -24,7 +24,8 @@
           <td>{{ item._source.board }}</td>
 
           <!-- handle scapy-data loss -->
-          <td v-if="item._source.date">{{ new Date(Number(item._source.date) * 1000).toISOString().split("T")[0] }}</td>
+          <!-- 因為時區的關係，需要加 8 小時 -->
+          <td v-if="item._source.date">{{ new Date((Number(item._source.date)+28800) * 1000).toISOString().split("T")[0] }}</td>
           <td v-else >無法顯示</td>
           <td v-if="item._source.article_title"><a target="_blank" :href="item._source.article_url">{{ item._source.article_title }}</a> </td>
           <td v-else><a target="_blank" :href="item._source.article_url">來源格式錯誤，點擊以查看原文網址</a> </td>
@@ -37,7 +38,7 @@
         <tr v-for="item in tableData" :key="item._id">
           <td>{{ item._source.user_id }}</td>
           <td>{{ item._source.board }}</td>
-          <td v-if="item._source.date">{{ new Date(Number(item._source.date) * 1000).toISOString().split("T")[0] }}</td>
+          <td v-if="item._source.date">{{ new Date((Number(item._source.date)+28800) * 1000).toISOString().split("T")[0] }}</td>
           <td v-else >無法顯示</td>
           <td><a target="_blank" :href="item._source.article_url">{{ item._source.article_title }}</a> </td>
           <td v-if="item._source.content.length <= 20">{{ item._source.comment_tag }} : {{ item._source.content }}</td>
