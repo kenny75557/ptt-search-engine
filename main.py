@@ -95,7 +95,7 @@ def GetByUserId():
                     ]
           }  #有下時間範圍
    
-    res=es.search(index="article", body= dsl)
+    res=es.search(index="article2", body= dsl)
     return json.dumps(res['hits'], indent=2, ensure_ascii=False)
     
 
@@ -173,7 +173,7 @@ def GetByContent():
           
   
           }  #有下時間範圍
-    res=es.search(index="article", body= dsl)
+    res=es.search(index="article2", body= dsl)
     return json.dumps(res['hits'], indent=2, ensure_ascii=False)
 
 

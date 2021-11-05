@@ -55,7 +55,7 @@ import Pagination from '../components/Pagination.vue';
     mounted(){
       var id = this.$route.params.id
       this.input = id
-      
+      //123
       // 在本地端測試的 url
       // var url = "http://140.120.182.87:6003/api/GetByUserId?user_id=" + id + "&start=none&end=none" //former call api method
       
