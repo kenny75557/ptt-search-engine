@@ -175,7 +175,59 @@ def GetByContent():
           }  #有下時間範圍
     res=es.search(index="article2", body= dsl)
     return json.dumps(res['hits'], indent=2, ensure_ascii=False)
+#BoardSearch API
+@app.route("/api/GetByBoard")
+def GetByBoard():
+  query_board =request.args.get("board")
+  query_startTimestamp =request.args.get("start")
+  query_endTimestamp =request.args.get("end")
+  
+  if request.args.get("size"):
+    query_size = request.args.get("size")
+  else:
+      query_size = 30
+  if request.args.get("from"):
+    query_page = request.args.get("from")
+  else:
+      query_page = 0
+  print(query_board)
+  print(query_startTimestamp)
+  if query_startTimestamp == None: 
+    print("notime")
+    dsl = {
+           "size": query_size, 
+           "from": query_page,
+           "query": {
+                "match": {"board": query_board }
+            },
+            "sort": [
+                      {"date": {"order": "desc"}}
+                    ]
+          }
 
+
+  else:
+    print("haveTime")
+    dsl = {
+           "size": query_size, 
+           "from": query_page,
+           "query":
+              { 
+            "bool": { 
+              "must": [ 
+                        { "match": {"board": query_board}},
+                        { "range": { "date": { "gt": query_startTimestamp,"lt":query_endTimestamp}}
+                         }
+                      ],
+              
+                 }
+              },
+              "sort": [
+                       {"date": {"order": "desc"} }
+                    ]
+          }  #有下時間範圍
+  res=es.search(index="article2", body= dsl)
+  return json.dumps(res['hits'], indent=2, ensure_ascii=False)
 
 
 
