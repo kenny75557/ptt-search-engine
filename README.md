@@ -1,335 +1,58 @@
 
 
 # Ptt_SearchEngineWeb
-## 使用Flask及Vuejs建立Web application
-使用vue前端框架開發一個單頁應用程式(SPA)，再將建置好的前端界面交由Flask作為服務端，處理Request以及對Elasticsearch下搜尋指令之API。此筆記將會分為Vue.js以及Flask兩部分。
-### 架構圖
+#　Introduction
+Build a search engine include all articles and commands crawl from Ptt(web forum), Searching content by keyword or by user’s id observe what articles they replied or post. This Repo only conclude Wep UI part.
+## Build a Web application using Flask and Vuejs
+Use the vue front-end framework to develop a single-page application (SPA), and then hand over the built front-end interface to Flask as the server to process Request and the API for search commands under Elasticsearch. This note will be divided into two parts: Vue.js and Flask.
+
+see VueJS README in ```vueptt``` directory.
+### Architecture diagram
 ![](https://i.imgur.com/JFfRHzW.png)
 
 
-網頁應用及路由基本觀念可以參考:
+For basic concepts of web application and routing, please refer to:
 [SPA & Router](https://blog.huli.tw/2019/09/18/spa-common-problem-about-router/)
 
 
 
 
-## Vue.js
-### 啟用
-前置:
 
-`npm install -g @vue/cli`
-
-安裝JS套件管理工具[yarn](https://yarnpkg.com/getting-started/install)
-```
-npm install -g yarn
-```
-
-### Compiles and hot-reloads for development
-開發時在專案目錄下可用來刷新修改後的網頁(直接在瀏覽器查看)。
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-修改程式後執行build，並把建置好的dist資料夾更新到後端目錄中。
-```
-yarn build
-```
-
-### 頁面架構
-```
-.
-├── package.json
-├── public
-│   ├── favicon.ico
-│   └── index.html  // 入口文件，系統進入之後先進入index.html
-└── src
-    ├── App.vue  // 專案中的主要組件，所有頁面都在App.vue下進行切換
-    ├── assets
-    │   ├── all.scss
-    │   ├── helpers
-    │   │   ├── AQI.scss
-    │   │   ├── reset.css
-    │   │   └── _variables.scss
-    │   └── logo.png
-    ├── bus.js
-    ├── components  // 將常用的功能寫成元件方便在不同頁面使用
-    │   ├── Footer.vue  // 網頁頁尾
-    │   ├── GetInput.vue  // 新增觀察ID的輸入欄位，可以得到使用者輸入的ID
-    │   ├── Header.vue  // 網頁標頭:放置網站標題、三個功能頁面的切換
-    │   ├── Pagination.vue  // 設定vuejs-paginate分頁套件
-    │   ├── Result.vue  // 帳號和關鍵字的搜尋結果
-    │   └── SearchingBar.vue  // 搜尋帳號和關鍵字的搜尋列，包括日期區間以及重設日期
-    ├── main.js  // 建立 Vue 的實例、使用額外套件主要import的地方
-    ├── router.js  // 路由檔案的配置及管理
-    └── views  // 顯示的頁面
-        ├── Index.vue  // 首頁:包括header和配置的路由元件
-        ├── ObserveList.vue  // 觀察帳號清單的頁面
-        ├── Search.vue  // 搜尋帳號和關鍵字的頁面
-        └── ViewRecords.vu  // 查看觀察清單紀錄的頁面
-```
-![](https://i.imgur.com/M2wL9fu.jpg)
-
-
-### Components使用
-#### Header.vue - 網頁標題以及三個功能頁面(帳號搜尋、關鍵字搜尋、觀察帳號清單)的切換
-In Vue Template - Basic Usage
-```html
-<Header><Header>
-```
-
-#### SearchingBar.vue - 搜尋帳號和關鍵字的搜尋列，包括日期區間以及重設日期
-In Vue Template - Basic Usage
-```html
-<SearchingBar @3param="functionName">
-</SearchingBar>
-```
-Example
-```html
-<template>
-  <SearchingBar @3param="urlMaker">
-  </SearchingBar>
-</template>
-
-<script>
-export default {
-  methods: {
-    urlMaker(input, d1, d2) {
-      console.log(input, d1, d2)
-    }
-  }
-}
-</script>
-```
-Props
-|Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Type | Description |
-| ----------------- | :--- | :--- |
-| `@3param` | `Function` | 這個方法使用在使用者搜尋帳號或關鍵字時，可以得到輸入以及選擇的日期。|
-
-#### Result.vue - 顯示帳號和關鍵字的搜尋結果
-In Vue Template - Basic Usage
-```html
-<Result 
-  :tableData='[
-    {
-      "_source": {
-        "article_id": "M.1604988654.A.8B3",
-        "user_id": "stinger5009",
-        "board": "C_Chat",
-        "date": 1605017522,
-        "article_url": "https://www.ptt.cc/bbs/C_Chat/M.1604988654.A.8B3.html",
-        "article_title": "[閒聊] 有沒有人跟我一樣對holo很失望= =",
-        "content": "超級喜歡~郭顏文~~",
-        "comment_tag": "推",
-      }
-    },
-    {
-      "_source": {
-        "article_id": "M.1604989190.A.632",
-        "user_id": "stinger5009",
-        "board": "C_Chat",
-        "date": 1605018120,
-        "article_url": "https://www.ptt.cc/bbs/C_Chat/M.1604989190.A.632.html",
-        "article_title": "[閒聊] 令狐沖打得過宋青書嗎？",
-        "content": "沖哥應該完全看不懂九陰白骨爪XD",
-        "comment_tag": "推",
-      }
-    },
-  ]'
-  :input="'stinger5009'"
-  :totalData="'共 720 筆資料'">
-</Result>
-```
-Value Binding
-```html
-<template>
-  <Result 
-    :tableData="tableData"
-    :input="input"
-    :totalData="totalData">
-  </Result>
-</template>
-
-<script>
-export default {
-  data() {
-    return {
-      tableData:[
-        {
-          "_source": {
-            "article_id": "M.1604988654.A.8B3",
-            "user_id": "stinger5009",
-            "board": "C_Chat",
-            "date": 1605017522,
-            "article_url": "https://www.ptt.cc/bbs/C_Chat/M.1604988654.A.8B3.html",
-            "article_title": "[閒聊] 有沒有人跟我一樣對holo很失望= =",
-            "content": "超級喜歡~郭顏文~~",
-            "comment_tag": "推",
-          }
-        },
-        {
-          "_source": {
-            "article_id": "M.1604989190.A.632",
-            "user_id": "stinger5009",
-            "board": "C_Chat",
-            "date": 1605018120,
-            "article_url": "https://www.ptt.cc/bbs/C_Chat/M.1604989190.A.632.html",
-            "article_title": "[閒聊] 令狐沖打得過宋青書嗎？",
-            "content": "沖哥應該完全看不懂九陰白骨爪XD",
-            "comment_tag": "推",
-          }
-        },
-      ]
-      input: 'stinger5009',
-      totalData: '共 720 筆資料',
-    }
-  }
-}
-</script>
-```
-Props
-|Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Type | Description |
-| ----------------- | :--- | :--- |
-| `tableData`       | `Array`  | 要顯示在表格上的搜尋資料，需要有<br>article_id(文章ID)、<br>user_id(使用者ID)、<br>board(版名)、<br>date(以timestamp顯示日期)、<br>article_url(文章連結)、<br>article_title(文章標題)、<br>content(文章或留言內容)、<br>comment_tag(留言標籤推/噓/->)<br>並且在"_source"這個dictionary中。 |
-| `input`           | `String` | 使用者輸入的搜尋。 |
-| `totalData`       | `String` | 顯示搜尋的總筆數。 |
-
-
-#### Pagination.vue - 將搜尋的結果做分頁顯示
-In Vue Template - Basic Usage
-```html
-<Pagination
-  :prevText="'Prev'"
-  :nextText="'Next'"
-  :linkClass="'page-link'"
-  @updatePage="functionName"
-  :pageNum="1"
-  :totalPageCount="721">
-</Pagination>
-```
-Example
-```html
-<template>
-  <Pagination
-    :prevText="'Prev'"
-    :nextText="'Next'"
-    :linkClass="'page-link'"
-    @updatePage="filterByPageNum"
-    :pageNum="1"
-    :totalPageCount="721">
-  </Pagination>
-</template>
-
-<script>
-export default {
-  methods: {
-    filterByPageNum(num) {
-      console.log(num)
-    }
-  }
-}
-</script>
-```
-Value Binding
-```html
-<template>
-  <Pagination
-    :prevText="prevText"
-    :nextText="nextText"
-    :linkClass="linkClass"
-    @updatePage="filterByPageNum"
-    :pageNum="pageNum"
-    :totalPageCount="totalPageCount">
-  </Pagination>
-</template>
-
-<script>
-export default {
-  data() {
-    return {
-      prevText: 'Prev',
-      nextText: 'Next',
-      linkClass: 'page-link',
-      pageNum: 3,
-      totalPageCount: 0,
-    }
-  }
-}
-</script>
-```
-Props
-|Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Type | Description |
-| ----------------- | :--- | :--- |
-| `prevText`       | `String` | 顯示在上一頁按鈕上的文字。 |
-| `nextText`       | `String` | 顯示在下一頁按鈕上的文字。 |
-| `linkClass`      | `String` | 分頁的樣式Class。 |
-| `@updatePage`    | `Function` | 這個方法使用在使用者在點選分頁按鈕時，可以得到目前的分頁頁數。 |
-| `pageNum`        | `Number` | 分頁現在指向的頁數。 |
-| `totalPageCount` | `Number` | 資料頁數的總數。 |
-
-#### GetInput.vue - 新增觀察ID的輸入欄位，可以得到使用者的輸入
-In Vue Template - Basic Usage
-```html
-<GetInput @getInput="getInput">
-</GetInput>
-```
-Example
-```html
-<template>
-  <GetInput @getInput="getInput">
-  </GetInput>
-</template>
-
-<script>
-export default {
-  methods: {
-    getInput(input) {
-      console.log(input)
-    }
-  }
-}
-</script>
-```
-Props
-|Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Type | Description |
-| ----------------- | :--- | :--- |
-| `@getInput` | `Function` | 這個方法使用在使用者新增觀察ID時，可以得到使用者輸入的ID。|
 
 ## Flask
-### 安裝flask
+### Installing
 
-安裝Flask和Flask-CORS擴充套件
+Install Flask and the Flask-CORS extension
 
 `(env)$ pip install Flask Flask-Cors `
 
-背景處理下(保存Session，可使用[Tmux](https://larrylu.blog/tmux-33a24e595fbc))，執行main.py即可將服務開啟在server。
+Under background processing (save Session, you can use[Tmux](https://larrylu.blog/tmux-33a24e595fbc))，Execute main.py to start the service on the server.
 ```
-//在Flask目錄下 
+//Flask directory
 tmux
-<Ctrl+b> + s//選擇Session 
+<Ctrl+b> + s//select Session 
 python app.py
 
 ```
 
 ### Query API
-處理如何將前端發送的搜尋條件處理成Query並發送到ElasticSearch。
+Handle how to process the search conditions sent by the front end into Query and send it to ElasticSearch.
 
-在main.py中引入Elasticsearch套件，對資料庫發request可回傳資料。
+Introduce the Elasticsearch suite in main.py, and send a request to the database to return the data.
 
-這邊使用環境參數是為了資料庫網域及密碼更動上有更多彈性，在部屬時由Docker指令帶入，也可以直接把輸入你ES服務的連接格式(如下方註解)。
+The environment parameters are used here to have more flexibility in changing the database domain and password. It is brought in by the Docker command when deploying, or you can directly enter the connection format of your ES service (as noted below).
 
-
-連結ES設定:
+Link to ES(database) settings:
 
 ```python
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 es = Elasticsearch(os.environ['ES'],connection_class=RequestsHttpConnection, use_ssl=True,verify_certs=False,send_get_body_as='POST' )
-//ES帶換成['http://elastic:<key>@<Domain>']
+//ES is the variabe of ['http://elastic:<key>@<Domain>']
 ```
 
 
-#### 搜尋處理範例(由id檢索)
-API格式如下，"?"符號之後為用於設定DSL語法搜尋之參數，Elastisearch如何Query請參照:[連結1](https://godleon.github.io/blog/Elasticsearch/Elasticsearch-advanced-search/) ，[連結2](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html)
+#### Search processing example (retrieved by id)
+The API format is as follows. After the "?" symbol is the parameter used to set the DSL syntax search. For how to query in Elastisearch, please refer to:[Link1](https://godleon.github.io/blog/Elasticsearch/Elasticsearch-advanced-search/) ，[Link2](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html)
 
 ```javascript
 <yourDomain>/api/GetByUserId?user_id=String&start=timeStamp&end=timeStamp?size=25?from=1
@@ -337,15 +60,15 @@ API格式如下，"?"符號之後為用於設定DSL語法搜尋之參數，Elast
 <yourDomain>/api/GetByContent?Content=String&start=timeStamp&end=timeStamp?size=25?from=1
 ```
 
-以下為使用到的變數:
-1. user_id:作者id
-1. content:內文搜尋(關鍵字)
-1. start:日期起始點(以Timestamp格式)
-1. end:日期結束點(以Timestamp格式)
-1. size:顯示幾筆資料
-1. from:從第幾筆資料開始
+The following variables are used:
+1. user_id:author id
+1. content:In-text search (keywords)
+1. start:Date start point (in Timestamp format)
+1. end:Date end point (in Timestamp format)
+1. size:Show several data
+1. from:From the first few data
 
-把資料處理好後包成DSL，使用ES的search function將送到DB，最後再以JSON格式回傳前端:
+After the data is processed and packaged into a DSL, the search function of ES will be used to send it to the DB, and finally it will be sent back to the front end in JSON format:
  ```python
 dsl = {
   "size": size,
@@ -387,47 +110,47 @@ dsl = {
     res=es.search(index="article2", body= dsl)
     return json.dumps(res['hits'], indent=2, ensure_ascii=False)
 ```
-其餘細節請參見程式碼註解
+See the code comments for the rest of the details
 
-### 將整套前後端包成Docker image
+### Wrap the whole set of front and back into Docker image
 #### Dockerfile
-寫一個Dockerfile將Build好的前端專案及Flask包成一個image。
+Write a Dockerfile to package the built front-end project and Flask into an image.
 
-[官方文檔](https://docs.docker.com/engine/reference/builder/)
+[official documentation](https://docs.docker.com/engine/reference/builder/)
 
 
 **Dockerfile**
 ```dockerfile
-FROM python:3.6.9 #Base Image環境版本
+FROM python:3.6.9 #Base Image Environment version
 
-WORKDIR /PTTapp #欲建立的工作目錄
+WORKDIR /PTTapp #The working directory to be created
 
-ADD . /PTTapp  #複製檔案及資料夾加入到指定位置
+ADD . /PTTapp  #Copy files and folders to the specified location
 
 RUN pip install -r requirements.txt
-# 每一個 RUN 指令會在現有映像檔之上加入新的一層，是在建立 (build) 映像檔的過程中會執行的指令。
-CMD python main.py #在Container中運行時所執行的指令
+# Each RUN command adds a new layer on top of the existing image and is the command that is executed during the build process of the image.
+CMD python main.py # instructions executed at runtime in container
 ```
-**requirements.txt**:所使用套件的版本。
+**requirements.txt**:The version of the kit used.
 
-完成後，使用指令Build出一個docker image，在Flask資料夾下，Terminal輸入
+After completion, use the command Build to generate a docker image, under the Flask folder, Terminal input
 ```
-docker image build -t <帳號>/<Image名稱>:<版本Tag> .
-//docker帳號可以省略，除非你有需要推到DockerHub上
+docker image build -t <Account>/<Image Name>:<Version Tag> .
+//docker Account can be omitted unless you need to push to DockerHub
 ```
 ![](https://i.imgur.com/Wo2qYbU.png)
 
-完成後可以在Terminal輸入`docker images`或是在應用程式上看到剛剛創建的檔案。
+When finished, you can type `docker images` in Terminal or see the file you just created on the application.
 ![](https://i.imgur.com/jpmcV7G.png)
 
-#### 執行
-使用docker run指令，把服務on在Container上。
+#### Execute
+Use the docker run command to put the service on the Container.
 ```lua
 
-docker run -d -e"ES=http://elastic:密碼@140.120.DB的對外port" -p 80:9527 --name newcontainer kenny2330/pttwebapp:ver_1.0
+docker run -d -e"ES=http://elastic:PASSWARD@140.120.Forward port of DB" -p 80:9527 --name newcontainer kenny2330/pttwebapp:ver_1.0
 ```
-指令參數:<br>
--e 參數設定，前面提到的ES用來設置資料庫的Domain及密碼 <br> 
--p 將主機的Port與Container的port綁定 <br> 
--name 替你的Container命名 <br> 
+Instruction parameters:<br>
+-e Parameter setting, the ES mentioned earlier is used to set the Domain and password of the database <br> 
+-p Bind the host's port to the container's port <br> 
+-name Name your Container <br> 
 
