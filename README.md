@@ -6,6 +6,7 @@
 
 Build a search engine include all articles and commands crawl from Ptt(web forum), Searching content by keyword or by user’s id observe what articles they replied or post. This Repo only conclude Wep UI part.
 ptt: https://en.wikipedia.org/wiki/PTT_Bulletin_Board_System
+[Demo-Link]([https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2](https://ptt-search.nlpnchu.org/))
 ## Build a Web application using Flask and Vuejs
 Use the vue front-end framework to develop a single-page application (SPA), and then hand over the built front-end interface to Flask as the server to process Request and the API for search commands under Elasticsearch. This note will be divided into two parts: Vue.js and Flask.
 
